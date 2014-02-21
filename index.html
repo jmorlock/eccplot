@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
         <meta charset="utf-8">
-        <title>Raphaël · Bouncer</title>
+        <title>Plot Elliptic Curves</title>
         <style media="screen">
             #holder {
                 width: 2048px;
@@ -12,20 +12,19 @@
         <script src="raphael.js"></script>
         <script>
             window.onload = function () {
-                function Point(x, y) {
+                function Point(x, y, p) {
                     this.x = x;
                     this.y = y;
+                    this.p = p;
 
                     this.add = add;
                     function add(p2) {
-                        var s = ((this.y - p2.y) / (this.x - p2.x)) % 17;
-                        var x = (s * s - this.x - p2.x) % 17;
-                        var y = (-this.y + s * (this.x - x)) % 17;
-                        return Point(x, y);
-                    }
+                        var s = Math.floor((this.y - p2.y) / (this.x - p2.x)) % p;
+                        var x = (s * s - this.x - p2.x) % p;
+                        var y = (-this.y + Math.floor(s * (this.x - x))) % p;
+                        return new Point(x, y, p);
+                  }
                 }
-                var A = (new Point(2, 0)).add(new Point(1, 3));
-//                window.alert(A);
 
                 var paper = Raphael("holder", 2048, 2048),
                     btn = document.getElementById("run"),
@@ -45,19 +44,35 @@
                     var xoffset = 40, yoffset = 40;
                     var gridcolor = "#AAAAAA";
                     for(var i = 0; i <= p; i++) {
-                          paper.path(["M", xoffset + i * grid, yoffset, "L", xoffset + i * grid, yoffset + p * grid]).attr({stroke: gridcolor});
-                          paper.path(["M", xoffset, yoffset + i * grid, "L", xoffset + p * grid, yoffset + i * grid]).attr({stroke: gridcolor});
-                          paper.text(xoffset - 10, yoffset + i * grid, i);
-                          paper.text(xoffset + i * grid, yoffset - 10, i);
+                        paper.path(["M", xoffset + i * grid, yoffset, "L", xoffset + i * grid, yoffset + p * grid]).attr({stroke: gridcolor});
+                        paper.path(["M", xoffset, yoffset + i * grid, "L", xoffset + p * grid, yoffset + i * grid]).attr({stroke: gridcolor});
+                        paper.text(xoffset - 10, yoffset + i * grid, i);
+                        paper.text(xoffset + i * grid, yoffset - 10, i);
                     }
+
+                    var A = null;
+                    
                     for(var x = 0; x < p; x++) {
-                          for(var y = 0; y < p; y++) {
-                            if ((y * y) % p == (a * x * x * x + b * x) % p)
-                                var circ = paper.circle(xoffset + x * grid, yoffset + y * grid, 5)
+                        for(var y = 0; y < p; y++) {
+                            if ((y * y) % p == (a * x * x * x + b * x) % p) {
+                                var circ = paper.circle(xoffset + x * grid, yoffset + y * grid, 5);
+                                circ._x = x;
+                                circ._y = y;
                                 circ.attr("fill", "#0000FF");
                                 circ.click(function() {
                                     this.attr("fill", "#FF0000");
+
+                                    if (A == null) {
+                               	        A = new Point(this._x, this._y, p);
+                                    } else {
+                               	        var C = A.add(new Point(this._x, this._y, p));
+                                        var circ2 = paper.circle(xoffset + C.x * grid, yoffset + C.y * grid, 5);
+                                        circ2.attr("fill", "#00FF00");
+                                        window.alert(C.x);
+                                        A = null;
+                                    }
                                 });
+                            }
                         }
                     }
                 })();
@@ -66,7 +81,7 @@
         </script>
     </head>
     <body>
-        <h1>Elliptic Curves</h1>
+        <h1>Plot Elliptic Curves</h1>
         <div>Grid size (px):<input id="grid" type="text" value="30"></input></div>
         <div><input id="code" type="text" value="23"></input></div>
         <div>a:<input id="a" type="text" value="50"></input>b:<input id="b" type="text" value="3"></input></div>
