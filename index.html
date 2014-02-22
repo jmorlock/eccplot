@@ -12,6 +12,10 @@
         <script src="raphael.js"></script>
         <script>
             window.onload = function () {
+            	function mod(m, n) {
+                    return ((m % n) + n) % n;
+                }
+
                 function Point(x, y, p) {
                     this.x = x;
                     this.y = y;
@@ -32,13 +36,15 @@
                     grid_elem = document.getElementById("grid");
 
                 var a_elem = document.getElementById("a"),
-                    b_elem = document.getElementById("b");
+                    b_elem = document.getElementById("b"),
+                    c_elem = document.getElementById("c");
 
                 (btn.onclick = function () {
                     paper.clear();
                     var p = cd.value,
                         a = a_elem.value,
-						b = b_elem.value;
+						b = b_elem.value,
+						c = c_elem.value;
                     
                     var grid = grid_elem.value;
                     var xoffset = 40, yoffset = 40;
@@ -54,7 +60,7 @@
                     
                     for(var x = 0; x < p; x++) {
                         for(var y = 0; y < p; y++) {
-                            if ((y * y) % p == (a * x * x * x + b * x) % p) {
+                            if (mod(y * y, p) == mod(a * x * x * x + b * x + c, p)) {
                                 var circ = paper.circle(xoffset + x * grid, yoffset + y * grid, 5);
                                 circ._x = x;
                                 circ._y = y;
@@ -84,7 +90,7 @@
         <h1>Plot Elliptic Curves</h1>
         <div>Grid size (px):<input id="grid" type="text" value="30"></input></div>
         <div><input id="code" type="text" value="23"></input></div>
-        <div>a:<input id="a" type="text" value="50"></input>b:<input id="b" type="text" value="3"></input></div>
+        <div>a:<input id="a" type="text" value="50"></input>b:<input id="b" type="text" value="3"></input>c:<input id="c" type="text" value="0"></input></div>
         <div><button id="run" type="button">Run</button></div>
         <div id="holder"></div>
     </body>
