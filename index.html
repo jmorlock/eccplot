@@ -23,13 +23,13 @@
 
                     this.add = add;
                     function add(p2) {
-                        var s = Math.floor((this.y - p2.y) / (this.x - p2.x)) % p;
-                        var x = (s * s - this.x - p2.x) % p;
-                        var y = (-this.y + Math.floor(s * (this.x - x))) % p;
+                        var s = mod((this.y - p2.y) / (this.x - p2.x), p);
+                        var x = mod(s * s - this.x - p2.x, p);
+                        var y = mod(-this.y + s * (this.x - x), p);
                         return new Point(x, y, p);
-                  }
+                    }
                 }
-
+             
                 var paper = Raphael("holder", 2048, 2048),
                     btn = document.getElementById("run"),
                     cd = document.getElementById("code");
@@ -41,10 +41,10 @@
 
                 (btn.onclick = function () {
                     paper.clear();
-                    var p = cd.value,
-                        a = a_elem.value,
-						b = b_elem.value,
-						c = c_elem.value;
+                    var p = parseInt(cd.value),
+                        a = parseInt(a_elem.value),
+						b = parseInt(b_elem.value),
+						c = parseInt(c_elem.value);
                     
                     var grid = grid_elem.value;
                     var xoffset = 40, yoffset = 40;
@@ -74,7 +74,6 @@
                                	        var C = A.add(new Point(this._x, this._y, p));
                                         var circ2 = paper.circle(xoffset + C.x * grid, yoffset + C.y * grid, 5);
                                         circ2.attr("fill", "#00FF00");
-                                        window.alert(C.x);
                                         A = null;
                                     }
                                 });
