@@ -23,10 +23,19 @@
 
                     this.add = add;
                     function add(p2) {
-                        var s = mod((this.y - p2.y) / (this.x - p2.x), p);
-                        var x = mod(s * s - this.x - p2.x, p);
-                        var y = mod(-this.y + s * (this.x - x), p);
-                        return new Point(x, y, p);
+                    	if((this.x == p2.x) && (this.y == p2.y)) {
+                            var s = mod((3 * this.x * this.x + 1) / (2 * this.y), p);
+                            var x = mod(s * s - 2 * this.x, p);
+                            var y = mod(-this.y + s * (this.x - x), p);
+                            return new Point(x, y, p);
+                    	} else
+                    	{
+                            var s = mod((this.y - p2.y) / (this.x - p2.x), p);
+                            var x = mod(s * s - this.x - p2.x, p);
+                            var y = mod(-this.y + s * (this.x - x), p);
+                            return new Point(x, y, p);
+                    		
+                    	}
                     }
                 }
              
@@ -49,9 +58,9 @@
                     var grid = grid_elem.value;
                     var xoffset = 40, yoffset = 40;
                     var gridcolor = "#AAAAAA";
-                    for(var i = 0; i <= p; i++) {
-                        paper.path(["M", xoffset + i * grid, yoffset, "L", xoffset + i * grid, yoffset + p * grid]).attr({stroke: gridcolor});
-                        paper.path(["M", xoffset, yoffset + i * grid, "L", xoffset + p * grid, yoffset + i * grid]).attr({stroke: gridcolor});
+                    for(var i = 0; i < p; i++) {
+                        paper.path(["M", xoffset + i * grid, yoffset, "L", xoffset + i * grid, yoffset + (p-1) * grid]).attr({stroke: gridcolor});
+                        paper.path(["M", xoffset, yoffset + i * grid, "L", xoffset + (p-1) * grid, yoffset + i * grid]).attr({stroke: gridcolor});
                         paper.text(xoffset - 10, yoffset + i * grid, i);
                         paper.text(xoffset + i * grid, yoffset - 10, i);
                     }
@@ -88,7 +97,7 @@
     <body>
         <h1>Plot Elliptic Curves</h1>
         <div>Grid size (px):<input id="grid" type="text" value="30"></input></div>
-        <div><input id="code" type="text" value="23"></input></div>
+        <div>p:<input id="code" type="text" value="23"></input></div>
         <div>a:<input id="a" type="text" value="50"></input>b:<input id="b" type="text" value="3"></input>c:<input id="c" type="text" value="0"></input></div>
         <div><button id="run" type="button">Run</button></div>
         <div id="holder"></div>
