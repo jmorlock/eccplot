@@ -10,24 +10,32 @@ function inv(x, p) {
 	}
 }
 
-function Point(x, y, p) {
+function Curve(p, a, b, c) {
+	this.p = p;
+	this.a = a;
+	this.b = b;
+	this.c = c;
+}
+
+function Point(x, y) {
 	this.x = x;
 	this.y = y;
-	this.p = p;
+}
 
-	this.add = add;
-	function add(p2) {
-		if ((this.x == p2.x) && (this.y == p2.y)) {
-			var s = mod((3 * this.x * this.x + 1) * inv(2 * this.y, p), p);
-			var x = mod(s * s - 2 * this.x, p);
-			var y = mod(-this.y + s * (this.x - x), p);
-			return new Point(x, y, p);
-		} else {
-			var s = mod((this.y - p2.y) * inv(this.x - p2.x, p), p);
-			var x = mod(s * s - this.x - p2.x, p);
-			var y = mod(-this.y + s * (this.x - x), p);
-			return new Point(x, y, p);
-
-		}
+function add(p1, p2, curve) {
+	if ((p1.x == p2.x) && (p1.y == p2.y)) {
+		var s = mod((3 * p1.x * p1.x + curve.a) * inv(2 * p1.y, curve.p), curve.p);
+		var x = mod(s * s - 2 * p1.x, curve.p);
+		var y = mod(-p1.y + s * (p1.x - x), curve.p);
+		return new Point(x, y);
+	} else {
+		var s = mod((p1.y - p2.y) * inv(p1.x - p2.x, curve.p), curve.p);
+		var x = mod(s * s - p1.x - p2.x, curve.p);
+		var y = mod(-p1.y + s * (p1.x - x), curve.p);
+		return new Point(x, y);
 	}
+}
+
+function isElem(point, curve) {
+	return mod(point.y * point.y, curve.p) == mod(curve.a * point.x * point.x * point.x + curve.b * point.x + curve.c, curve.p)
 }

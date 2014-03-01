@@ -40,21 +40,24 @@
                     }
 
                     var A = null;
+                    
+                    var curve = new Curve(p, a, b, c);
 
                     for(var x = 0; x < p; x++) {
                         for(var y = 0; y < p; y++) {
-                            if (mod(y * y, p) == mod(a * x * x * x + b * x + c, p)) {
-                                var circ = paper.circle(xoffset + x * grid, yoffset + y * grid, 5);
-                                circ._x = x;
-                                circ._y = y;
+                        	var current = new Point(x, y);
+                            if (isElem(current, curve)) {
+                                var circ = paper.circle(xoffset + current.x * grid, yoffset + current.y * grid, 5);
+                                circ._x = current.x;
+                                circ._y = current.y;
                                 circ.attr("fill", "#0000FF");
                                 circ.click(function() {
                                     this.attr("fill", "#FF0000");
 
                                     if (A == null) {
-                               	        A = new Point(this._x, this._y, p);
+                               	        A = new Point(this._x, this._y);
                                     } else {
-                               	        var C = A.add(new Point(this._x, this._y, p));
+                               	        var C = add(A, new Point(this._x, this._y), curve);
                                         var circ2 = paper.circle(xoffset + C.x * grid, yoffset + C.y * grid, 5);
                                         circ2.attr("fill", "#00FF00");
                                         A = null;

@@ -11,14 +11,39 @@
 <script src="resources/qunit.js"></script>
 <script src="resources/ecc.js"></script>
 <script>
+
 test("mod test", function() {
-	ok(mod(5, 2) == 1, "Positive modulo passed");
-	ok(mod(-5, 2) == 1, "Negative modulo passed");
+	ok(mod(5, 2) == 1, "Positive modulo test passed");
+	ok(mod(-5, 2) == 1, "Negative modulo test passed");
 });
 
 test("inv test", function() {
-	ok(inv(4, 23) == 6, "inv(4, 23) test passed");
+	ok(inv(4, 23) == 6);
 });
+
+test("add(P, Q) test", function() {
+	var curve = new Curve(17, 1, 1, 7);
+	var P = new Point(2, 0),
+	    Q = new Point(1, 3);
+	deepEqual(add(P, Q, curve), new Point(6, 12));
+});
+
+test("add(P, P) test", function() {
+	var curve = new Curve(17, 1, 1, 7);
+	var P = new Point(1, 3);
+	deepEqual(add(P, P, curve), new Point(6, 5));
+});
+
+test("isElem test", function() {
+	var curve = new Curve(17, 1, 1, 7);
+
+	var point = new Point(2, 0);
+	ok(isElem(point, curve) == true, "On-curve test passed");
+
+	var point = new Point(2, 1);
+	ok(isElem(point, curve) == false, "Not-on-curve test passed");	
+});
+
 </script>
 </body>
 </html>
