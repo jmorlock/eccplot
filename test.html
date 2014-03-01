@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>QUnit Example</title>
+<link rel="stylesheet" href="resources/qunit.css">
+</head>
+<body>
+<div id="qunit"></div>
+<div id="qunit-fixture"></div>
+<script src="resources/qunit.js"></script>
+<script src="resources/ecc.js"></script>
+<script>
+test("mod test", function() {
+	ok(mod(5, 2) == 1, "Positive modulo passed");
+	ok(mod(-5, 2) == 1, "Negative modulo passed");
+});
+
+test("inv test", function() {
+	ok(inv(4, 23) == 6, "inv(4, 23) test passed");
+});
+</script>
+</body>
+</html>

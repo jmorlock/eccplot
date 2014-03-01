@@ -9,44 +9,10 @@
                 height: 2048px;
             }
         </style>
-        <script src="raphael.js"></script>
+        <script src="resources/raphael.js"></script>
+        <script src="resources/ecc.js"></script>
         <script>
             window.onload = function () {
-            	function mod(m, n) {
-                    return ((m % n) + n) % n;
-                }
-            	
-            	function inv(x, p) {
-            		for(var i = 0; i < p; i++) {
-                        if(mod(x * i, p) == 1) {
-                        	return i;
-                        }
-            		}
-            	}
-
-                function Point(x, y, p) {
-                    this.x = x;
-                    this.y = y;
-                    this.p = p;
-
-                    this.add = add;
-                    function add(p2) {
-                    	if((this.x == p2.x) && (this.y == p2.y)) {
-                            var s = mod((3 * this.x * this.x + 1) * inv(2 * this.y, p), p);
-                            var x = mod(s * s - 2 * this.x, p);
-                            var y = mod(-this.y + s * (this.x - x), p);
-                            return new Point(x, y, p);
-                    	} else
-                    	{
-                            var s = mod((this.y - p2.y) * inv(this.x - p2.x, p), p);
-                            var x = mod(s * s - this.x - p2.x, p);
-                            var y = mod(-this.y + s * (this.x - x), p);
-                            return new Point(x, y, p);
-                    		
-                    	}
-                    }
-                }
-             
                 var paper = Raphael("holder", 2048, 2048),
                     btn = document.getElementById("run"),
                     cd = document.getElementById("code");
@@ -62,7 +28,7 @@
                         a = parseInt(a_elem.value),
 						b = parseInt(b_elem.value),
 						c = parseInt(c_elem.value);
-                    
+
                     var grid = grid_elem.value;
                     var xoffset = 40, yoffset = 40;
                     var gridcolor = "#AAAAAA";
@@ -74,7 +40,7 @@
                     }
 
                     var A = null;
-                    
+
                     for(var x = 0; x < p; x++) {
                         for(var y = 0; y < p; y++) {
                             if (mod(y * y, p) == mod(a * x * x * x + b * x + c, p)) {
@@ -99,7 +65,6 @@
                     }
                 })();
             };
-
         </script>
     </head>
     <body>
