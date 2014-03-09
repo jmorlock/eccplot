@@ -12,6 +12,11 @@
 <script src="resources/ecc.js"></script>
 <script>
 
+test("div test", function() {
+    ok(div(5, 2) == 2);
+});
+
+
 test("mod test", function() {
 	ok(mod(5, 2) == 1, "Positive modulo test passed");
 	ok(mod(-5, 2) == 1, "Negative modulo test passed");
@@ -19,6 +24,20 @@ test("mod test", function() {
 
 test("inv test", function() {
 	ok(inv(4, 23) == 6);
+	ok(inv(3, 11) == 4);
+});
+
+test("euclid-next test", function() {
+    var result = euclid_next([240, 1, 0], [46, 0, 1]);
+    deepEqual(result, [10, 1, -5]);
+
+    var result = euclid_next([46, 0, 1], [10, 1, -5]);
+    deepEqual(result, [6, -4, 21]);
+});
+
+test("extended euclid test", function() {
+    var result = ext_euclid(240, 46);
+    deepEqual(result, [2, -9, 47]);
 });
 
 test("add(P, Q) test", function() {
