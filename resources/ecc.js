@@ -10,8 +10,8 @@ function mod(m, n) {
 }
 
 /**
- * Determine the modular multiplicative inverse using brute force.
- * The time complexity of this algorithm is O(p). 
+ * Determine the modular multiplicative inverse using brute force. The time
+ * complexity of this algorithm is O(p).
  */
 function inv_brute(x, p) {
     for ( var i = 0; i < p; i++) {
@@ -21,30 +21,26 @@ function inv_brute(x, p) {
     }
 }
 
-
-function euclid_next(prev, curr){
+function euclid_next(prev, curr) {
     q = div(prev[0], curr[0]);
-    return [
-        prev[0] - q * curr[0],
-        prev[1] - q * curr[1],
-        prev[2] - q * curr[2]
-    ];
+    return [ prev[0] - q * curr[0], prev[1] - q * curr[1],
+            prev[2] - q * curr[2] ];
 }
 
 function ext_euclid(a, b) {
-     var prev = [a, 1, 0];
-     var curr = [b, 0, 1];
-     while(curr[0] != 0) {
-         var next = euclid_next(prev, curr);
-         prev = curr;
-         curr = next;
-     }
+    var prev = [ a, 1, 0 ];
+    var curr = [ b, 0, 1 ];
+    while (curr[0] != 0) {
+        var next = euclid_next(prev, curr);
+        prev = curr;
+        curr = next;
+    }
 
-     return prev;
+    return prev;
 }
 
 /**
- * Determine the modular multiplicative inverse. 
+ * Determine the modular multiplicative inverse.
  */
 function inv(x, p) {
     var euclid = ext_euclid(x, p);
@@ -81,4 +77,37 @@ function add(p1, p2, curve) {
 function isElem(point, curve) {
     return mod(point.y * point.y, curve.p) == mod(curve.a * point.x * point.x
             * point.x + curve.b * point.x + curve.c, curve.p)
+}
+
+function Marker(canvas, point) {
+
+    this.canvas = canvas;
+    this.point = point;
+
+    this.draw = function(callback) {
+        var xoffset = 40, yoffset = 40, radius = 5, grid = 30;
+
+        var markerCirc = canvas.circle(xoffset + point.x * grid,
+                yoffset + point.y * grid, radius).attr("fill", "#0000FF");
+
+        var hoverCirc = canvas.circle(xoffset + point.x * grid,
+                yoffset + point.y * grid, 15).attr({"fill": "#000000",
+                "opacity": 0});
+        hoverCirc.click(function() {
+            markerCirc.attr("fill", "#FF0000");
+            callback(point);
+        });
+
+        var pointLabel = canvas.text(xoffset + point.x * grid + 20,
+                yoffset + point.y * grid + 15,
+                "(" + point.x + "," + point.y + ")").attr({
+            "font-size" : 20
+        }).hide().toBack();
+
+        hoverCirc.hover(function() {
+            pointLabel.show();
+        }, function() {
+            pointLabel.hide();
+        });
+    }
 }

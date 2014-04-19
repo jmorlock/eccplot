@@ -26,8 +26,8 @@
                     paper.clear();
                     var p = parseInt(cd.value),
                         a = parseInt(a_elem.value),
-						b = parseInt(b_elem.value),
-						c = parseInt(c_elem.value);
+                        b = parseInt(b_elem.value),
+                        c = parseInt(c_elem.value);
 
                     var grid = grid_elem.value;
                     var xoffset = 40, yoffset = 40;
@@ -40,25 +40,21 @@
                     }
 
                     var A = null;
-                    
-                    var curve = new Curve(p, a, b, c);
 
+                    var curve = new Curve(p, a, b, c);
+                    
                     for(var x = 0; x < p; x++) {
                         for(var y = 0; y < p; y++) {
-                        	var current = new Point(x, y);
+                            var current = new Point(x, y);
                             if (isElem(current, curve)) {
-                                var circ = paper.circle(xoffset + current.x * grid, yoffset + current.y * grid, 5);
-                                circ._x = current.x;
-                                circ._y = current.y;
-                                circ.attr("fill", "#0000FF");
-                                circ.click(function() {
-                                    this.attr("fill", "#FF0000");
-
+                                var m = new Marker(paper, current);
+                                m.draw(function(point){
                                     if (A == null) {
-                               	        A = new Point(this._x, this._y);
+                                        A = point;
                                     } else {
-                               	        var C = add(A, new Point(this._x, this._y), curve);
-                                        var circ2 = paper.circle(xoffset + C.x * grid, yoffset + C.y * grid, 5);
+                                        var C = add(A, point, curve);
+                                        var circ2 = paper.circle(xoffset + C.x * grid, yoffset + C.y
+                                          * grid, 5);
                                         circ2.attr("fill", "#00FF00");
                                         A = null;
                                     }
