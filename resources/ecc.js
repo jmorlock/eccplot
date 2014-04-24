@@ -59,6 +59,10 @@ function Point(x, y) {
     this.y = y;
 }
 
+function equals(p1, p2) {
+    return ((p1.x == p2.x) && (p1.y == p2.y));
+}
+
 // Is this a good name?
 function Line(p1, p2) {
     this.p1 = p1;
@@ -93,203 +97,37 @@ function castRay(p1, p2, curve) {
     do {
         end.x += deltaX;
         end.y += deltaY;
-    } while(isElem(end, curve) == false);
+    } while (isElem(end, curve) == false);
 
     return end;
 }
 
-function inRange(point, curve) {
-    return (point.x >= 0) && (point.x <= curve.p) && (point.y >= 0) && (point.y <= curve.p);
-}
-
-var DirectionEnum = {
-    N:  0,
-    E:  1,
-    S:  2,
-    W:  3,
-    NE: 4,
-    SE: 5,
-    SW: 6,
-    NW: 7,
-    UNDEFINED: -1
-};
-
-function getDirection(line) {
-    var deltaX = line.p2.x - line.p1.x,
-        deltaY = line.p2.y - line.p1.y;
-    
-    if ((deltaX == 0) && (deltaY > 0)) {
-        return DirectionEnum.S;
-    }
-    if ((deltaX == 0) && (deltaY < 0)) {
-        return DirectionEnum.N;
-    }
-    if ((deltaX > 0) && (deltaY == 0)) {
-        return DirectionEnum.E;
-    }
-    if ((deltaX < 0) && (deltaY == 0)) {
-        return DirectionEnum.W;
-    }
-    if ((deltaX < 0) && (deltaY < 0)) {
-        return DirectionEnum.NW;
-    }
-    if ((deltaX < 0) && (deltaY > 0)) {
-        return DirectionEnum.SW;
-    }
-    if ((deltaX > 0) && (deltaY < 0)) {
-        return DirectionEnum.NE;
-    }
-    if ((deltaX > 0) && (deltaY > 0)) {
-        return DirectionEnum.SE;
-    }
-
-    return DirectionEnum.UNDEFINED;
-}
-
-function isAdjusted(line) {
-    var deltaX = line.p2.x - line.p1.x,
-        deltaY = line.p2.y - line.p1.y;
-
-    return (deltaX > 0) && (deltaY >= 0);
-}
-
 /**
- * Rotate input point by 90 degrees.
- */
-function rotate(point) {
-    return new Point(-point.y, point.x);
-}
-
-function rev_rotate(point) {
-    return new Point(point.y, -point.x);
-}
-
-/**
- * 
- */
-function adjust(line) {
-    var count = 0;
-    
-    while (!isAdjusted(line)) {
-        count += 1;
-        line = new Line(rotate(line.p1), rotate(line.p2));
-    }
-
-    return {"count": count, "line": line};
-}
-
-/**
- * Shift line in a way that p1 meets the following conditions.
- * 0 <= x < p
- * 0 <= y < p
+ * Shift line in a way that p1 meets the following conditions. 0 <= x < p 0 <= y <
+ * p
  */
 function shift(line, curve) {
-    while((line.p1.x < 0) || (line.p2.x < 0)) {
+    while ((line.p1.x < 0) || (line.p2.x < 0)) {
         line.p1.x += curve.p;
         line.p2.x += curve.p;
     }
-    
-    while((line.p1.y < 0) || (line.p2.y < 0)) {
+
+    while ((line.p1.y < 0) || (line.p2.y < 0)) {
         line.p1.y += curve.p;
         line.p2.y += curve.p;
     }
 
-    while((line.p1.x > curve.p) || (line.p2.x > curve.p)) {
+    while ((line.p1.x > curve.p) || (line.p2.x > curve.p)) {
         line.p1.x -= curve.p;
         line.p2.x -= curve.p;
     }
 
-    while((line.p1.y > curve.p) || (line.p2.y > curve.p)) {
+    while ((line.p1.y > curve.p) || (line.p2.y > curve.p)) {
         line.p1.y -= curve.p;
         line.p2.y -= curve.p;
     }
-            
+
     return line;
-}
-
-/*
- * 
- * x1 <= x2
- */
-function getIntersections(x1, x2, p) {
-    var ints = new Array();
-    for(var i = (Math.floor(x1 / p) + 1) * p; i < x2; i += p) {
-        ints.push(i);
-    }
-    return ints;
-}
-
-function Numsort (a, b) {
-    return a - b;
-  }
-
-function splitLine(line, curve) {
-    adjustment = adjust(line);
-    var line = adjustment["line"];
-    var cx = adjustment["count"];
-    
-    var intX = getIntersections(line.p1.x, line.p2.x, curve.p);
-    var intY = getIntersections(line.p1.y, line.p2.y, curve.p);
-
-    if(line.p1.x - line.p2.x == 0) {
-        intX = new Array();
-        for(var i = 0; i < intY.length; i++) {
-            intX.push(line.p1.x);
-        }
-    } else if(line.p1.y - line.p2.y == 0) {
-        intY = new Array();
-        for(var i = 0; i < intX.length; i++) {
-            intY.push(line.p1.y);
-        }
-    } else {
-        
-    }
-
-    
-//    for (int i = 0; i < intX.length; i++) {
-//        var y = (line.p2.x - line.p1.x) / (line.p2.y - line.p1.y) * (intX[i] - line.p1.x) + line.p1.y;
-//        intY.push(y);
-//    }
-//    
-//    for (int i = 0; i < intY.length; i++) {
-//        var y = (line.p2.y - line.p1.y) / (line.p2.x - line.p1.x) * (intY[i] - line.p1.y) + line.p1.x;
-//        intX.push(y);
-//    }
-    
-    intX.push(line.p1.x, line.p2.x);
-    intY.push(line.p1.y, line.p2.y);
-    intX.sort(Numsort);
-    intY.sort(Numsort);
-    
-    var lines = new Array();
-    // assert intX.length = intY.length?
-    for (var i = 0; i < intX.length-1; i++) {
-        lines.push(new Line(new Point(intX[i], intY[i]), new Point(intX[i+1], intY[i+1])));
-    }
-    
-    
-    for (var i = 0; i < lines.length; i++) {
-        for (var j = 0; j < cx; j++) {
-            lines[i] = new Line(rev_rotate(lines[i].p1), rev_rotate(lines[i].p2));
-        }
-    }
-    
-    for (var i = 0; i < lines.length; i++) {
-        lines[i] = shift(lines[i], curve);
-    }
-    
-    
-    return lines;
-}
-
-function sign(x) {
-    if (x > 0) {
-        return +1;
-    } else if (x < 0) {
-        return -1;
-    } 
-
-    return 0;
 }
 
 function dist(p1, p2) {
@@ -302,40 +140,37 @@ function getDist(p0) {
     }
 }
 
-function equals(p1, p2)
-{
-    return ((p1.x == p2.x) && (p1.y == p2.y));
-}
-
 function uniqPoints(points) {
     var current = points[0];
     var uniqPoints = new Array(current);
-    
-    for(var i = 1; i < points.length; i++) {
+
+    for ( var i = 1; i < points.length; i++) {
         if (!equals(current, points[i])) {
             current = points[i];
             uniqPoints.push(current);
         }
     }
-    
+
     return uniqPoints;
 }
 
 function unitSplit(line) {
     var points = new Array();
-    
+
     var xMin = Math.min(line.p1.x, line.p2.x);
     var xMax = Math.max(line.p1.x, line.p2.x);
     var yMin = Math.min(line.p1.y, line.p2.y);
     var yMax = Math.max(line.p1.y, line.p2.y);
-    
-    for(var x = xMin; x < xMax; x += 1) {
-        var y = (line.p2.y - line.p1.y) / (line.p2.x - line.p1.x) * (x - line.p1.x) + line.p1.y;
+
+    for ( var x = xMin; x < xMax; x += 1) {
+        var y = (line.p2.y - line.p1.y) / (line.p2.x - line.p1.x)
+                * (x - line.p1.x) + line.p1.y;
         points.push(new Point(x, y));
     }
 
-    for(var y = yMin; y < yMax; y += 1) {
-        var x = (line.p2.x - line.p1.x) / (line.p2.y - line.p1.y) * (y - line.p1.y) + line.p1.x;
+    for ( var y = yMin; y < yMax; y += 1) {
+        var x = (line.p2.x - line.p1.x) / (line.p2.y - line.p1.y)
+                * (y - line.p1.y) + line.p1.x;
         points.push(new Point(x, y));
     }
 
@@ -350,25 +185,25 @@ function splitLine(line, curve) {
     var first = points.shift();
     var last = points.pop();
 
-    var relevantPoints = new Array(first); 
-    for(var i = 0; i < points.length; i++) {
-        if((points[i].x % curve.p == 0) || (points[i].y % curve.p == 0)) {
+    var relevantPoints = new Array(first);
+    for ( var i = 0; i < points.length; i++) {
+        if ((points[i].x % curve.p == 0) || (points[i].y % curve.p == 0)) {
             relevantPoints.push(points[i]);
         }
     }
     relevantPoints.push(last);
-    
+
     var lines = new Array();
-    for(var i = 0; i < relevantPoints.length-1; i++) {
+    for ( var i = 0; i < relevantPoints.length - 1; i++) {
         lines.push(new Line(
-               new Point(relevantPoints[i].x, relevantPoints[i].y), 
-               new Point(relevantPoints[i+1].x, relevantPoints[i+1].y )));
+                new Point(relevantPoints[i].x, relevantPoints[i].y), new Point(
+                        relevantPoints[i + 1].x, relevantPoints[i + 1].y)));
     }
 
-    for(var i = 0; i < lines.length; i++) {
+    for ( var i = 0; i < lines.length; i++) {
         lines[i] = shift(lines[i], curve);
     }
-    
+
     return lines;
 }
 
@@ -384,8 +219,10 @@ function Marker(canvas, point) {
                 yoffset + point.y * grid, radius).attr("fill", "#0000FF");
 
         var hoverCirc = canvas.circle(xoffset + point.x * grid,
-                yoffset + point.y * grid, 15).attr({"fill": "#000000",
-                "opacity": 0});
+                yoffset + point.y * grid, 15).attr({
+            "fill" : "#000000",
+            "opacity" : 0
+        });
         hoverCirc.click(function() {
             markerCirc.attr("fill", "#FF0000");
             callback(point);

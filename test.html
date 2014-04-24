@@ -72,39 +72,6 @@ test("castRay test", function() {
     deepEqual(castRay(p1, p2, curve), new Point(13, -1));  
 });
 
-test("getDirection tests", function() {
-    var origin = new Point(0, 0);
-
-    var dir = getDirection(new Line(origin, new Point(0, -1)));
-    equal(dir, DirectionEnum.N);
-    var dir = getDirection(new Line(origin, new Point(1, -1)));
-    equal(dir, DirectionEnum.NE);
-    var dir = getDirection(new Line(origin, new Point(1, 0)));
-    equal(dir, DirectionEnum.E);
-    var dir = getDirection(new Line(origin, new Point(1, 1)));
-    equal(dir, DirectionEnum.SE);
-    var dir = getDirection(new Line(origin, new Point(0, 1)));
-    equal(dir, DirectionEnum.S);
-    var dir = getDirection(new Line(origin, new Point(-1, 1)));
-    equal(dir, DirectionEnum.SW);
-    var dir = getDirection(new Line(origin, new Point(-1, 0)));
-    equal(dir, DirectionEnum.W);
-    var dir = getDirection(new Line(origin, new Point(-1, -1)));
-    equal(dir, DirectionEnum.NW);
-});
-
-test("skew adjustment test", function() {
-    var adj = adjust(new Line(new Point(1, -1), new Point(3, -3)));
-    equal(adj["count"], 1);
-    deepEqual(adj["line"], new Line(new Point(1, 1), new Point(3, 3)));
-});
-
-test("straight adjust test", function() {
-    var adj = adjust(new Line(new Point(1, -1), new Point(3, -1)));
-    equal(adj["count"], 0);
-    deepEqual(adj["line"], new Line(new Point(1, -1), new Point(3, -1)));
-});
-
 test("shift test", function() {
     var curve = new Curve(7, 1, 3, 5);
     var line = shift(new Line(new Point(-1, 5), new Point(-2, 3)), curve);
@@ -123,17 +90,6 @@ test("shift test", function() {
     deepEqual(new Line(new Point(1, 3), new Point(7, 1)), line);
 });
 
-test("getIntersections tests", function() {
-    var ints = getIntersections(-22, 11, 7);
-    deepEqual([-21, -14, -7, 0, 7], ints);
-
-    var ints = getIntersections(3, 4, 7);
-    deepEqual([], ints);
-
-    var ints = getIntersections(-1, 1, 7);
-    deepEqual([0], ints);
-});
-
 test("unitSplit slope test", function() {
     var line = new Line(new Point(1, 1), new Point(2, 3));    
     deepEqual(unitSplit(line), [new Point(1, 1), new Point(1.5, 2), new Point(2, 3)]);
@@ -148,32 +104,6 @@ test("unitSplit vertical test", function() {
     var line = new Line(new Point(1, 5), new Point(1, 1));    
     deepEqual(unitSplit(line), [new Point(1, 5), new Point(1, 4), new Point(1, 3), new Point(1, 2), new Point(1, 1)]);
 });
-
-/*
-test("splitLine flatline test", function() {
-    var curve = new Curve(7, 1, 3, 5);
-
-    var p1 = new Point(1, 1),
-        p2 = new Point(13, 1);
-
-    deepEqual(splitLine(new Line(p1, p2), curve), [
-        new Line(new Point(1, 1), new Point(7, 1)),
-        new Line(new Point(0, 1), new Point(6, 1))
-    ]);
-});
-
-test("splitLine reversed flatline test", function() {
-    var curve = new Curve(7, 1, 3, 5);
-
-    var p1 = new Point(1, 1),
-        p2 = new Point(-1, 1);
-
-    deepEqual(splitLine(new Line(p1, p2), curve), [
-        new Line(new Point(1, 1), new Point(0, 1)),
-        new Line(new Point(7, 1), new Point(6, 1))
-    ]);
-});*/
-
 
 test("splitLine test", function() {
     var curve = new Curve(7, 1, 3, 5);
