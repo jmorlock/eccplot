@@ -5,6 +5,9 @@ function div(m, n) {
     return Math.floor(m / n);
 }
 
+/**
+ * Modulo function using only positive values.
+ */
 function mod(m, n) {
     return ((m % n) + n) % n;
 }
@@ -21,12 +24,19 @@ function inv_brute(x, p) {
     }
 }
 
+/**
+ * Iteration within the extended euclidean algorithm.
+ */
 function euclid_next(prev, curr) {
     q = div(prev[0], curr[0]);
     return [ prev[0] - q * curr[0], prev[1] - q * curr[1],
             prev[2] - q * curr[2] ];
 }
 
+/**
+ * Determine the modular multiplicative inverse using the extended euclidean
+ * algorithm. The time complexity of this algorithm is O(log(m)**2).
+ */
 function ext_euclid(a, b) {
     var prev = [ a, 1, 0 ];
     var curr = [ b, 0, 1 ];
@@ -47,6 +57,9 @@ function inv(x, p) {
     return euclid[1];
 }
 
+/**
+ * Class representing discrete elliptic curve
+ */
 function Curve(p, a, b, c) {
     this.p = p;
     this.a = a;
@@ -54,21 +67,53 @@ function Curve(p, a, b, c) {
     this.c = c;
 }
 
+/**
+ * Class representing a point
+ */
 function Point(x, y) {
     this.x = x;
     this.y = y;
 }
 
+/**
+ * Copy input point
+ */
+function copyPoint(point) {
+    return new Point(point.x, point.y);
+}
+
+/**
+ * Check whether two points are equal.
+ */
 function equals(p1, p2) {
     return ((p1.x == p2.x) && (p1.y == p2.y));
 }
 
-// Is this a good name?
-function Line(p1, p2) {
+/**
+ * Euclidean distance between two points.
+ */
+function dist(p1, p2) {
+    return Math.sqrt(Math.pow(p2.y - p1.y, 2) + Math.pow(p2.x - p1.x, 2));
+}
+
+/**
+ * Arrow starting at p1, ending at p2
+ */
+function Arrow(p1, p2) {
     this.p1 = p1;
     this.p2 = p2;
 }
 
+/**
+ * Copy input arrow
+ */
+function copyArrow(arrow) {
+    return new Arrow(copyPoint(arrow.p1), copyPoint(arrow.p2));
+}
+
+/**
+ * Add two points. Both must lie on the given curve.
+ */
 function add(p1, p2, curve) {
     if ((p1.x == p2.x) && (p1.y == p2.y)) {
         var s = mod((3 * p1.x * p1.x + curve.a) * inv(2 * p1.y, curve.p),
@@ -84,14 +129,21 @@ function add(p1, p2, curve) {
     }
 }
 
+/**
+ * Check whether an input point lies on a given curve.
+ */
 function isElem(point, curve) {
     return mod(point.y * point.y, curve.p) == mod(curve.a * point.x * point.x
             * point.x + curve.b * point.x + curve.c, curve.p)
 }
 
+/**
+ * Return the first point which is met by an extended arrow from p1 to p2. All
+ * points involve lie on the given curve.
+ */
 function castRay(p1, p2, curve) {
     var deltaX = p2.x - p1.x, deltaY = p2.y - p1.y;
-    // euclidean here
+    // TODO euclidean here
     var end = new Point(p2.x, p2.y);
 
     do {
@@ -103,43 +155,49 @@ function castRay(p1, p2, curve) {
 }
 
 /**
- * Shift line in a way that p1 meets the following conditions. 0 <= x < p 0 <= y <
- * p
+ * Shift the input arrow vertically and horizontally by multiples of p. The
+ * result is a new array where the coordinates of both points satisfy the
+ * equations (0 <= x <= p) and( 0 <= y <= p).
  */
-function shift(line, curve) {
-    while ((line.p1.x < 0) || (line.p2.x < 0)) {
-        line.p1.x += curve.p;
-        line.p2.x += curve.p;
+function shift(inputArrow, p) {
+    var arrow = copyArrow(inputArrow);
+
+    while ((arrow.p1.x < 0) || (arrow.p2.x < 0)) {
+        arrow.p1.x += p;
+        arrow.p2.x += p;
     }
 
-    while ((line.p1.y < 0) || (line.p2.y < 0)) {
-        line.p1.y += curve.p;
-        line.p2.y += curve.p;
+    while ((arrow.p1.y < 0) || (arrow.p2.y < 0)) {
+        arrow.p1.y += p;
+        arrow.p2.y += p;
     }
 
-    while ((line.p1.x > curve.p) || (line.p2.x > curve.p)) {
-        line.p1.x -= curve.p;
-        line.p2.x -= curve.p;
+    while ((arrow.p1.x > p) || (arrow.p2.x > p)) {
+        arrow.p1.x -= p;
+        arrow.p2.x -= p;
     }
 
-    while ((line.p1.y > curve.p) || (line.p2.y > curve.p)) {
-        line.p1.y -= curve.p;
-        line.p2.y -= curve.p;
+    while ((arrow.p1.y > p) || (arrow.p2.y > p)) {
+        arrow.p1.y -= p;
+        arrow.p2.y -= p;
     }
 
-    return line;
+    return arrow;
 }
 
-function dist(p1, p2) {
-    return Math.sqrt(Math.pow(p2.y - p1.y, 2) + Math.pow(p2.x - p1.x, 2));
-}
-
+/**
+ * Return a comparison function indicating which of two input points p1 and p2
+ * possesses the smaller distance to a common reference point p0.
+ */
 function getDist(p0) {
     return function(p1, p2) {
         return dist(p0, p1) - dist(p0, p2);
     }
 }
 
+/**
+ * Remove identical points occurring in a row.
+ */
 function uniqPoints(points) {
     var current = points[0];
     var uniqPoints = new Array(current);
@@ -154,34 +212,41 @@ function uniqPoints(points) {
     return uniqPoints;
 }
 
-function unitSplit(line) {
+/**
+ * Split the input arrow at each point where either x or y is integer.
+ */
+function unitSplit(arrow) {
     var points = new Array();
 
-    var xMin = Math.min(line.p1.x, line.p2.x);
-    var xMax = Math.max(line.p1.x, line.p2.x);
-    var yMin = Math.min(line.p1.y, line.p2.y);
-    var yMax = Math.max(line.p1.y, line.p2.y);
+    var xMin = Math.min(arrow.p1.x, arrow.p2.x);
+    var xMax = Math.max(arrow.p1.x, arrow.p2.x);
+    var yMin = Math.min(arrow.p1.y, arrow.p2.y);
+    var yMax = Math.max(arrow.p1.y, arrow.p2.y);
 
     for ( var x = xMin; x < xMax; x += 1) {
-        var y = (line.p2.y - line.p1.y) / (line.p2.x - line.p1.x)
-                * (x - line.p1.x) + line.p1.y;
+        var y = (arrow.p2.y - arrow.p1.y) / (arrow.p2.x - arrow.p1.x)
+                * (x - arrow.p1.x) + arrow.p1.y;
         points.push(new Point(x, y));
     }
 
     for ( var y = yMin; y < yMax; y += 1) {
-        var x = (line.p2.x - line.p1.x) / (line.p2.y - line.p1.y)
-                * (y - line.p1.y) + line.p1.x;
+        var x = (arrow.p2.x - arrow.p1.x) / (arrow.p2.y - arrow.p1.y)
+                * (y - arrow.p1.y) + arrow.p1.x;
         points.push(new Point(x, y));
     }
 
     points.push(new Point(xMax, yMax));
-    points.sort(getDist(line.p1));
+    points.sort(getDist(arrow.p1));
 
     return uniqPoints(points);
 }
 
-function splitLine(line, curve) {
-    var points = unitSplit(line);
+/**
+ * Split the input arrow into smaller arrows all lying within the area of
+ * validity.
+ */
+function splitArrow(arrow, curve) {
+    var points = unitSplit(arrow);
     var first = points.shift();
     var last = points.pop();
 
@@ -193,20 +258,21 @@ function splitLine(line, curve) {
     }
     relevantPoints.push(last);
 
-    var lines = new Array();
+    var arrows = new Array();
     for ( var i = 0; i < relevantPoints.length - 1; i++) {
-        lines.push(new Line(
-                new Point(relevantPoints[i].x, relevantPoints[i].y), new Point(
-                        relevantPoints[i + 1].x, relevantPoints[i + 1].y)));
+        arrows.push(new Arrow(relevantPoints[i], relevantPoints[i + 1]));
     }
 
-    for ( var i = 0; i < lines.length; i++) {
-        lines[i] = shift(lines[i], curve);
+    for ( var i = 0; i < arrows.length; i++) {
+        arrows[i] = shift(arrows[i], curve.p);
     }
 
-    return lines;
+    return arrows;
 }
 
+/**
+ * Draw a marker representing a point.
+ */
 function Marker(canvas, point) {
 
     this.canvas = canvas;
