@@ -6,7 +6,8 @@ function div(m, n) {
 }
 
 /**
- * Modulo function using only positive values.
+ * Modulo function yielding positive values even if m is negative.
+ * Note: the result is negative, if n is negative.
  */
 function mod(m, n) {
     return ((m % n) + n) % n;
@@ -138,12 +139,27 @@ function isElem(point, curve) {
 }
 
 /**
+ * Return the greatest common divisor of a and b.
+ * The result is positive.
+ */
+function gcd(a, b) {
+    if (b == 0) {
+        return a;
+    }
+    return Math.abs(gcd(b, mod(a, b)));  
+}  
+
+/**
  * Return the first point which is met by an extended arrow from p1 to p2. All
  * points involve lie on the given curve.
  */
 function castRay(p1, p2, curve) {
     var deltaX = p2.x - p1.x, deltaY = p2.y - p1.y;
-    // TODO euclidean here
+
+    var dgcd = gcd(deltaX, deltaY);
+    deltaX /= dgcd;
+    deltaY /= dgcd;
+    
     var end = new Point(p2.x, p2.y);
 
     do {

@@ -39,6 +39,12 @@ test("extended euclid test", function() {
     deepEqual(result, [2, -9, 47]);
 });
 
+test("gcd tests", function() {
+    deepEqual(gcd(9, 12), 3);
+    deepEqual(gcd(13, 7), 1);
+    deepEqual(gcd(3, -1), 1);
+});
+
 test("add(P, Q) test", function() {
 	var curve = new Curve(17, 1, 1, 7);
 	var P = new Point(2, 0),
