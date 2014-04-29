@@ -1,3 +1,7 @@
+var xoffset = 40;
+var yoffset = 40;
+var grid = 30;
+
 /**
  * Integer division.
  */
@@ -6,8 +10,8 @@ function div(m, n) {
 }
 
 /**
- * Modulo function yielding positive values even if m is negative.
- * Note: the result is negative, if n is negative.
+ * Modulo function yielding positive values even if m is negative. Note: the
+ * result is negative, if n is negative.
  */
 function mod(m, n) {
     return ((m % n) + n) % n;
@@ -139,15 +143,14 @@ function isElem(point, curve) {
 }
 
 /**
- * Return the greatest common divisor of a and b.
- * The result is positive.
+ * Return the greatest common divisor of a and b. The result is positive.
  */
 function gcd(a, b) {
     if (b == 0) {
         return a;
     }
-    return Math.abs(gcd(b, mod(a, b)));  
-}  
+    return Math.abs(gcd(b, mod(a, b)));
+}
 
 /**
  * Return the first point which is met by an extended arrow from p1 to p2. All
@@ -159,7 +162,7 @@ function castRay(p1, p2, curve) {
     var dgcd = gcd(deltaX, deltaY);
     deltaX /= dgcd;
     deltaY /= dgcd;
-    
+
     var end = new Point(p2.x, p2.y);
 
     do {
@@ -290,12 +293,11 @@ function splitArrow(arrow, curve) {
  * Draw a marker representing a point.
  */
 function Marker(canvas, point) {
-
     this.canvas = canvas;
     this.point = point;
 
     this.draw = function(callback) {
-        var xoffset = 40, yoffset = 40, radius = 5, grid = 30;
+        var radius = 5;
 
         var markerCirc = canvas.circle(xoffset + point.x * grid,
                 yoffset + point.y * grid, radius).attr("fill", "#0000FF");
@@ -321,5 +323,59 @@ function Marker(canvas, point) {
         }, function() {
             pointLabel.hide();
         });
+    }
+}
+
+function animateRay(p1, p2, curve, canvas) {
+    end = castRay(p1, p2, curve);
+
+    arrows = splitArrow(new Arrow(p1, end), curve);
+    if (arrows.length > 100) {
+        alert("Arrow limit exceeded");
+    } else {
+        function drawArrow() {
+            first = arrows.shift();
+            var c = canvas.path(
+                    [ "M", first.p1.x * grid + xoffset,
+                            first.p1.y * grid + yoffset ]).attr({
+                'stroke' : "#999",
+                'stroke-dasharray' : "-",
+                'stroke-width': 3
+            });
+
+            var eukildLength = Math.sqrt(Math.pow(first.p2.x - first.p1.x, 2)
+                    + Math.pow(first.p2.y - first.p1.y, 2));
+
+            c.stop().animate(
+                    {
+                        path : [ "M", first.p1.x * grid + xoffset,
+                                first.p1.y * grid + yoffset, "L",
+                                first.p2.x * grid + xoffset,
+                                first.p2.y * grid + yoffset ],
+                        easing : "linear"
+                    }, eukildLength / 0.008, drawArrow);
+        }
+        drawArrow();
+    }
+}
+
+function drawGrid(p, canvas) {
+    var gridcolor = "#AAAAAA";
+    for ( var i = 0; i <= p; i++) {
+        canvas.path(
+                [ "M", xoffset + i * grid, yoffset, "L", xoffset + i * grid,
+                        yoffset + p * grid ]).attr({
+            stroke : gridcolor
+        });
+        canvas.path(
+                [ "M", xoffset, yoffset + i * grid, "L",
+                        xoffset + p * grid, yoffset + i * grid ]).attr({
+            stroke : gridcolor
+        });
+    }
+
+    for ( var i = 0; i < p; i++) {
+        canvas.text(xoffset - 10, yoffset + i * grid, i);
+        canvas.text(xoffset + i * grid, yoffset - 10, i);
     }
 }
