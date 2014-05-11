@@ -115,6 +115,16 @@ test("splitLine test", function() {
     ]);
 });
 
+test("getYTwin test", function() {
+    var twin = getYTwin(new Point(12, 8), new Curve(17, 1, 1, 7));
+    deepEqual(twin, new Point(12, 9));
+});
+
+test("getYTwin idem test", function() {
+    var twin = getYTwin(new Point(2, 0), new Curve(17, 1, 1, 7));
+    deepEqual(twin, null);
+});
+
 </script>
 </body>
 </html>

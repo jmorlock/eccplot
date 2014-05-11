@@ -326,10 +326,34 @@ function Marker(canvas, point) {
     }
 }
 
+/**
+ * Get the vertical twin of a point located on a given curve. The input point
+ * must be located on that curve.
+ */
+function getYTwin(point, curve) {
+    var x = point.x;
+    for (var y = 0; y < curve.p; y += 1) {
+        twin = new Point(x, y);
+        if(isElem(twin, curve) && (twin.y != point.y)) {
+            return twin;
+        }
+    }
+
+    return null;
+}
+
+/**
+ * Animate the ray cast from p1 through p2 on a given curve.
+ */
 function animateRay(p1, p2, curve, canvas) {
     end = castRay(p1, p2, curve);
 
     arrows = splitArrow(new Arrow(p1, end), curve);
+    twin = getYTwin(arrows[arrows.length-1].p2, curve);
+    if(twin != null) {
+        arrows.push(new Arrow(arrows[arrows.length-1].p2, twin));
+    }
+    
     if (arrows.length > 100) {
         alert("Arrow limit exceeded");
     } else {
@@ -359,6 +383,9 @@ function animateRay(p1, p2, curve, canvas) {
     }
 }
 
+/**
+ * Draw the grid.
+ */
 function drawGrid(p, canvas) {
     var gridcolor = "#AAAAAA";
     for ( var i = 0; i <= p; i++) {
