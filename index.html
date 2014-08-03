@@ -30,16 +30,19 @@
 
                     drawGrid(p, paper);
 
-                    var A = null;
-
                     var curve = new Curve(p, a, b, c);
+
+                    var markers = new Array(p);
+                    for(var x = 0; x < p; x++) {
+                        markers[x] = new Array(p);
+                    }
 
                     for(var x = 0; x < p; x++) {
                         for(var y = 0; y < p; y++) {
                             var current = new Point(x, y);
                             if (isElem(current, curve)) {
-                                var m = new Marker(paper, current);
-                                m.draw(function(point) {
+                                markers[x][y] = new Marker(paper, current);
+                                markers[x][y].draw(function(point) {
                                     if (A == null) {
                                         A = point;
                                     } else {

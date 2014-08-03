@@ -2,6 +2,8 @@ var xoffset = 40;
 var yoffset = 40;
 var grid = 30;
 
+var A = null;
+
 /**
  * Integer division.
  */
@@ -154,10 +156,15 @@ function gcd(a, b) {
 
 /**
  * Return the first point which is met by an extended arrow from p1 to p2. All
- * points involve lie on the given curve.
+ * points involved must lie on the given curve.
  */
 function castRay(p1, p2, curve) {
-    var deltaX = p2.x - p1.x, deltaY = p2.y - p1.y;
+    if ((p1.x == p2.x) && (p1.y == p2.y)) {
+        var deltaX = mod(2 * p1.y, curve.p);
+        var deltaY = mod(3 * curve.a * p1.x * p1.x + curve.b, curve.p);
+    } else {
+        var deltaX = p2.x - p1.x, deltaY = p2.y - p1.y;
+    }
 
     var dgcd = gcd(deltaX, deltaY);
     deltaX /= dgcd;
@@ -291,6 +298,7 @@ function splitArrow(arrow, curve) {
 
 /**
  * Draw a marker representing a point.
+ * TODO add set color function
  */
 function Marker(canvas, point) {
     this.canvas = canvas;
@@ -329,6 +337,7 @@ function Marker(canvas, point) {
 /**
  * Get the vertical twin of a point located on a given curve. The input point
  * must be located on that curve.
+ * TODO Consider that there isn't always a twin
  */
 function getYTwin(point, curve) {
     var x = point.x;
@@ -357,8 +366,15 @@ function animateRay(p1, p2, curve, canvas) {
     if (arrows.length > 100) {
         alert("Arrow limit exceeded");
     } else {
+        var lines = new Array();
         function drawArrow() {
             first = arrows.shift();
+            if (first == null) {
+                for ( var i = 0; i < lines.length; i++) {
+                    lines[i].remove();
+                }
+                return;
+            }
             var c = canvas.path(
                     [ "M", first.p1.x * grid + xoffset,
                             first.p1.y * grid + yoffset ]).attr({
@@ -366,18 +382,18 @@ function animateRay(p1, p2, curve, canvas) {
                 'stroke-dasharray' : "-",
                 'stroke-width': 3
             });
+            lines.push(c);
 
             var eukildLength = Math.sqrt(Math.pow(first.p2.x - first.p1.x, 2)
                     + Math.pow(first.p2.y - first.p1.y, 2));
 
-            c.stop().animate(
-                    {
-                        path : [ "M", first.p1.x * grid + xoffset,
-                                first.p1.y * grid + yoffset, "L",
-                                first.p2.x * grid + xoffset,
-                                first.p2.y * grid + yoffset ],
-                        easing : "linear"
-                    }, eukildLength / 0.008, drawArrow);
+            c.animate({
+                path : [ "M", first.p1.x * grid + xoffset,
+                              first.p1.y * grid + yoffset,
+                         "L", first.p2.x * grid + xoffset,
+                              first.p2.y * grid + yoffset ],
+                easing : "linear"
+            }, eukildLength / 0.008, drawArrow);
         }
         drawArrow();
     }
