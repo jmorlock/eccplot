@@ -13,7 +13,5 @@ The technology stack used consists of HTML, JavaScript, CSS and [Raphaël](http:
 Roadmap
 -------
 
-* Plot the coordinates of the points selected
-* Visualize the addition of two points using animations
 * Implement k-multiplication
 * Show the calculations inside a status bar
