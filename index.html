@@ -43,14 +43,18 @@
                             if (isElem(current, curve)) {
                                 markers[x][y] = new Marker(paper, current);
                                 markers[x][y].draw(function(point) {
-                                    if (A == null) {
-                                        A = point;
+                                    if (P1 == null) {
+                                        P1 = point;
+                                        P1_marker = paper.circle(
+                                            xoffset + point.x * grid,
+                                            yoffset + point.y * grid, 5).attr("fill", "#FF0000");
                                     } else {
-                                        var C = add(A, point, curve);
-                                        var circ2 = paper.circle(xoffset + C.x * grid, yoffset + C.y
-                                          * grid, 5).attr("fill", "#00FF00");
-                                        animateRay(A, point, curve, paper);
-                                        A = null;                
+                                        P2 = point;
+                                        P2_marker = paper.circle(xoffset + point.x * grid,
+                                                yoffset + point.y * grid, 5).attr("fill", "#FF0000");
+
+                                        var C = add(P1, P2, curve);
+                                        animateRay(P1, P2, curve, paper);
                                     }
                                 });
                             }

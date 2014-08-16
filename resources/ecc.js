@@ -2,7 +2,10 @@ var xoffset = 40;
 var yoffset = 40;
 var grid = 30;
 
-var A = null;
+var P1 = null;
+var P2 = null;
+var P1_marker = null;
+var P2_marker = null;
 
 /**
  * Integer division.
@@ -298,7 +301,6 @@ function splitArrow(arrow, curve) {
 
 /**
  * Draw a marker representing a point.
- * TODO add set color function
  */
 function Marker(canvas, point) {
     this.canvas = canvas;
@@ -316,13 +318,14 @@ function Marker(canvas, point) {
             "opacity" : 0
         });
         hoverCirc.click(function() {
-            markerCirc.attr("fill", "#FF0000");
             callback(point);
         });
 
-        var pointLabel = canvas.text(xoffset + point.x * grid + 20,
-                yoffset + point.y * grid + 15,
-                "(" + point.x + "," + point.y + ")").attr({
+        var pointLabel = canvas.text(
+            xoffset + point.x * grid + 20,
+            yoffset + point.y * grid + 15,
+            "(" + point.x + "," + point.y + ")"
+        ).attr({
             "font-size" : 20
         }).hide().toBack();
 
@@ -356,7 +359,7 @@ function getYTwin(point, curve) {
  */
 function animateRay(p1, p2, curve, canvas) {
     end = castRay(p1, p2, curve);
-
+    
     arrows = splitArrow(new Arrow(p1, end), curve);
     twin = getYTwin(arrows[arrows.length-1].p2, curve);
     if(twin != null) {
@@ -370,9 +373,28 @@ function animateRay(p1, p2, curve, canvas) {
         function drawArrow() {
             first = arrows.shift();
             if (first == null) {
+                var result_marker = canvas.circle(
+                        xoffset + twin.x * grid,
+                        yoffset + twin.y * grid,
+						5
+				).attr("fill", "#0000FF");
+                result_marker.stop().animate(
+					{"fill-opacity": 0, "r": 20, "stroke-width": 0},
+					1000,
+					function() {
+						result_marker.remove();
+					}
+				);
+                
                 for ( var i = 0; i < lines.length; i++) {
                     lines[i].remove();
                 }
+                P1_marker.remove();
+                P2_marker.remove();
+                P1_marker = null;
+                P2_marker = null;
+                P1 = null;
+                P2 = null;
                 return;
             }
             var c = canvas.path(
